@@ -5,9 +5,10 @@ use strict;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-require Mason;
-require Mason::Interp;
-require Mason::Request;
+use Mason;
+use Mason::Interp;
+use Mason::Request;
+use Mason::Result;
 
 =head1 NAME
 
@@ -41,11 +42,12 @@ our $VERSION = '0.01';
 
   # example -2-
     use Mojolicious::Lite;
-    plugin 'mason2_renderer' => { interp_params  => { comp_root => "/path/to/mason/comps",
-                                                      ... (other parameters to the new() Mason::Interp constructor)
-                                                    },
-                                  request_params => { ... (other parameters to the new() Mason::Request constructor)
-                                                    },
+    plugin 'mason2_renderer' => { preload_regexps => [ '.mc$', '/path/to/comps/to/preload', ... ],
+                                  interp_params   => { comp_root => "/path/to/mason/comps",
+                                                       ... (other parameters to the new() Mason::Interp constructor)
+                                                     },
+                                  request_params  => { ... (other parameters to the new() Mason::Request constructor)
+                                                     },
     };
     get '/' => sub {
         my $self = shift;
@@ -90,11 +92,12 @@ our $VERSION = '0.01';
 
     sub startup {
       my $self = shift;
-      $self->plugin('mason2_renderer', { interp_params  => { comp_root => "/path/to/mason/comps",
-                                                             ... (other parameters to the new() Mason::Interp constructor)
-                                                           },
-                                         request_params => { ... (other parameters to the new() Mason::Request constructor)
-                                                           },
+      $self->plugin('mason2_renderer', { preload_regexps => [ '.mc$', '/path/to/comps/to/preload', ... ],
+                                         interp_params   => { comp_root => "/path/to/mason/comps",
+                                                              ... (other parameters to the new() Mason::Interp constructor)
+                                                            },
+                                         request_params  => { ... (other parameters to the new() Mason::Request constructor)
+                                                            },
                                        }
       );
       $self->routes->get('/' => sub {
@@ -156,6 +159,17 @@ sub register {
 
     # make Mason::Interp
     my $interp = Mason->new(%{$conf->{interp_params}});
+
+
+    # preload comps ?
+    if( (defined $conf->{preload_regexps}) && (ref($conf->{preload_regexps}) eq "ARRAY") ) {
+	foreach my $regexp (@{$conf->{preload_regexps}}) {
+	    foreach my $comp ($interp->all_paths) {
+		next if($comp=~/.+~$/);
+		$interp->load($comp) if($comp =~ /$regexp/);
+	    }
+	}
+    }
 
 
     # Mason::Request params

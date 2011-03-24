@@ -27,11 +27,12 @@ Mason (2) : http://search.cpan.org/~jswartz/Mason/
 
   # example -2-
     use Mojolicious::Lite;
-    plugin 'mason2_renderer' => { interp_params  => { comp_root => "/path/to/mason/comps",
-                                                      ... (other parameters to the new() Mason::Interp constructor)
-                                                    },
-                                  request_params => { ... (other parameters to the new() Mason::Request constructor)
-                                                    },
+    plugin 'mason2_renderer' => { preload_regexps => [ '.mc$', '/path/to/comps/to/preload', ... ],
+                                  interp_params   => { comp_root => "/path/to/mason/comps",
+                                                       ... (other parameters to the new() Mason::Interp constructor)
+                                                     },
+                                  request_params  => { ... (other parameters to the new() Mason::Request constructor)
+                                                     },
     };
     get '/' => sub {
         my $self = shift;
@@ -76,11 +77,12 @@ Mason (2) : http://search.cpan.org/~jswartz/Mason/
 
     sub startup {
       my $self = shift;
-      $self->plugin('mason2_renderer', { interp_params  => { comp_root => "/path/to/mason/comps",
+      $self->plugin('mason2_renderer', { preload_regexps => [ '.mc$', '/path/to/comps/to/preload', ... ],
+                                         interp_params   => { comp_root => "/path/to/mason/comps",
                                                              ... (other parameters to the new() Mason::Interp constructor)
-                                                           },
-                                         request_params => { ... (other parameters to the new() Mason::Request constructor)
-                                                           },
+                                                            },
+                                         request_params  => { ... (other parameters to the new() Mason::Request constructor)
+                                                            },
                                        }
       );
       $self->routes->get('/' => sub {
