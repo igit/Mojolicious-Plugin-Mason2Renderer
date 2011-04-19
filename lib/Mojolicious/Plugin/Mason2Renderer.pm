@@ -9,6 +9,7 @@ use Mason;
 use Mason::Interp;
 use Mason::Request;
 use Mason::Result;
+use Encode;
 
 =head1 NAME
 
@@ -20,7 +21,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -212,6 +213,10 @@ sub register {
 		$$output = "";
 		return 0;
 	    }
+	    
+
+	    # Encoding
+            $$output = decode($r->encoding, $$output) if $r->encoding;
 
 
 	    # All seems OK

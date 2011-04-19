@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Mojolicious-Plugin-Mason2Renderer
-version:            0.01
+version:            0.02
 abstract:           Mason 2 (aka Mason 2.x) Renderer Plugin.
 author:
     - Alexandre SIMON <asimon@cpan.org>
